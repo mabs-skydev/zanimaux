@@ -44,6 +44,30 @@ router.post('/', async (req, res) => {
     }
 });
 
+router.patch('/:id/status', async (req, res) => {
+    const consultation = await Consultation.findById(req.params.id);
+    const types = ['approved', 'rejected'];
+
+    if (!types.includes(req.body.status)) return res.status(400).json({
+        success: false,
+        message: 'Status should be "approved" or "rejected"'
+    });
+
+    if (!consultation) return res.status(404).json({
+        success: false,
+        message: 'Consultation not found!'
+    })
+
+    consultation.status = req.body.status;
+
+    await consultation.save();
+
+    res.json({
+        success: true,
+        data: consultation
+    });
+});
+
 const compareDates = (firstDate, secondDate) => {
     firstDateTS = moment(firstDate).format('YYYY-MM-DD hh:mm');
     secondDateTs = moment(secondDate).format('YYYY-MM-DD hh:mm');
